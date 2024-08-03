@@ -164,7 +164,7 @@ const [hello, bar, world] = ["hello", "bar", "world"];
 // or
 [const hello, bar, var world] = ["hello", "bar", "world"];
 
-// IIf there's an attempt to change the variable type already existing in scope to a different one (var/let/const), the code should not run. 
+// If there's an attempt to change the variable type already existing in scope to a different one (var/let/const), the code should not run. 
 
 // Can't change from existing `let bar` to `var bar`
 //             |
