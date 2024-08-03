@@ -1,50 +1,152 @@
-# template-for-proposals
+# ECMAScript proposal: Destructuring with variable declaration assignment
 
-A repository template for ECMAScript proposals.
+## Status
 
-## Before creating a proposal
+This proposal is in WIP mode and has not been championed to TC39 yet.
 
-Please ensure the following:
-  1. You have read the [process document](https://tc39.github.io/process-document/)
-  1. You have reviewed the [existing proposals](https://github.com/tc39/proposals/)
-  1. You are aware that your proposal requires being a member of TC39, or locating a TC39 delegate to “champion” your proposal
+## Overview / Motivation
 
-## Create your proposal repo
+Variable destructuring was an exciting addition to the JS spec - it is a useful feature of the language used daily by millions of developers and you can find it being used in most of the modern software:
 
-Follow these steps:
-  1. Click the green [“use this template”](https://github.com/tc39/template-for-proposals/generate) button in the repo header. (Note: Do not fork this repo in GitHub's web interface, as that will later prevent transfer into the TC39 organization)
-  1. Update ecmarkup and the biblio to the latest version: `npm install --save-dev ecmarkup@latest && npm install --save-dev --save-exact @tc39/ecma262-biblio@latest`.
-  1. Go to your repo settings page:
-      1. Under “General”, under “Features”, ensure “Issues” is checked, and disable “Wiki”, and “Projects” (unless you intend to use Projects)
-      1. Under “Pull Requests”, check “Always suggest updating pull request branches” and “automatically delete head branches”
-      1. Under the “Pages” section on the left sidebar, and set the source to “deploy from a branch” and check “Enforce HTTPS”
-      1. Under the “Actions” section on the left sidebar, under “General”, select “Read and write permissions” under “Workflow permissions” and click “Save”
-  1. [“How to write a good explainer”][explainer] explains how to make a good first impression.
+```typescript
+// Solid.js Signals
+const [state, setState] = createSignal(...);
 
-      > Each TC39 proposal should have a `README.md` file which explains the purpose
-      > of the proposal and its shape at a high level.
-      >
-      > ...
-      >
-      > The rest of this page can be used as a template ...
+const [first, second, ...rest] = [
+  "Destructuring",
+  "with",
+  "Variable",
+  "Declaration",
+  "Assignment"
+];
 
-      Your explainer can point readers to the `index.html` generated from `spec.emu`
-      via markdown like
+// Read through this function, we will need it in a bit
+// https://github.com/scopsy/await-to-js/blob/master/src/await-to-js.ts
+export function to<T, U = Error>(
+  promise: Promise<T>,
+  errorExt?: object,
+): Promise<[U, undefined] | [null, T]> {
+  return promise
+    .then<[null, T]>((data: T) => [null, data])
+    .catch<[U, undefined]>((err: U) => {
+      if (errorExt) {
+        const parsedError = Object.assign({}, err, errorExt);
+        return [parsedError, undefined];
+      }
 
-      ```markdown
-      You can browse the [ecmarkup output](https://ACCOUNT.github.io/PROJECT/)
-      or browse the [source](https://github.com/ACCOUNT/PROJECT/blob/HEAD/spec.emu).
-      ```
+      return [err, undefined];
+    });
+}
 
-      where *ACCOUNT* and *PROJECT* are the first two path elements in your project's Github URL.
-      For example, for github.com/**tc39**/**template-for-proposals**, *ACCOUNT* is “tc39”
-      and *PROJECT* is “template-for-proposals”.
+const [err, result] = await to(prisma.user.findUnique({ ... }));
+```
 
+This already looks very good, it's flexible and powerful, and also provides a good developer experience, but there currently is no way to declare the variable type (var/let/const) for each destructured element individually. This makes impossible coding patterns like the following:
 
-## Maintain your proposal repo
+```typescript
+// Real-world scenario
+// - SolidStart code
+// - Using the `to` function from the previous code block
+// - With pseudo code to showcase the usecase
 
-  1. Make your changes to `spec.emu` (ecmarkup uses HTML syntax, but is not HTML, so I strongly suggest not naming it “.html”)
-  1. Any commit that makes meaningful changes to the spec, should run `npm run build` to verify that the build will succeed and the output looks as expected.
-  1. Whenever you update `ecmarkup`, run `npm run build` to verify that the build will succeed and the output looks as expected.
+const signInAction = action(async (payload: SignInPayloadType) => {
+  "use server"
 
-  [explainer]: https://github.com/tc39/how-we-work/blob/HEAD/explainer.md
+  const [let err, matchingUser] = await to(prisma.user.findUnique({ ... }));
+  // Or
+  [let err, const matchingUser] = await to(prisma.user.findUnique({ ... }));
+
+  if (err) {
+    return rpcErrorResponse(err);
+  }
+
+  [err, const isValidPassword] = await to(fake_validatePassword(
+    matchingUser.encryptedPassword,
+    payload.password
+  ));
+
+  if (err) {
+    return rpcErrorResponse(err);
+  }
+
+  [err, const emailSentSuccess] = await to(fake_sendConfirmationEmail(
+    matchingUser,
+  ));
+
+  if (err) {
+    return rpcErrorResponse(err);
+  }
+
+  ...
+
+  return rpcSuccessResponse(matchingUser);
+}, "auth:sign-in");
+```
+
+At the moment these are the only ways we can customise the variable type for the destructured arrays:
+
+```typescript
+// const
+const [foo, bar] = [1, 2];
+
+// let
+let [foo, bar] = [1, 2];
+
+let foo, bar
+[foo, bar] = [1, 2];
+
+// var
+var [foo, bar] = [1, 2];
+
+var foo, bar
+[foo, bar] = [1, 2];
+```
+
+## Proposed syntax
+
+This proposal is chapioning the expansion of the array destructuring syntax. The extra syntax will allow for individual variable declaration assignment on each destructured array element.
+
+> The following is pseudocode outlining the main features of the proposed syntax
+
+The type assigned in front of the destructuring can be considered the `default` type.
+
+```typescript
+const [foo, bar] = [1, 2, 3]; // Both foo & bar are `const`
+```
+
+Any declaration that's assigned as part of the destructuring, will take precedence over the default as it is the more specifc variable type.
+
+```typescript
+// - Example 1 -
+// `const` foo, `let` bar, `const` ...rest
+const [foo, let bar, ...rest] = [1, 2, 3, 4];
+
+// - Example 2 -
+// `const` foo, `let` bar, `var` baz
+const [foo, let bar, var baz] = [1, 2, 3, 4];
+
+// - Example 3 -
+// `let` foo, `let` bar, `const` baz
+let [foo, bar, const baz] = [1, 2, 3, 4];
+```
+
+The following code should behave identically to the code above:
+
+```typescript
+// - Example 1 -
+// `const` foo, `let` bar, `const` ...rest
+// TODO: Need to decide between those
+[const foo, let bar, const ...rest] = [1, 2, 3, 4];
+[const foo, let bar, ...const rest] = [1, 2, 3, 4];
+
+// - Example 2 -
+// `const` foo, `let` bar, `var` baz
+[const foo, let bar, var baz] = [1, 2, 3, 4];
+```
+
+Either the `default` variable type must be used/declared, or each destructured element must have its own declaration. The following code should not run:
+
+```typescript
+// `var` _, `const` bar, `???` ...rest
+[var _, const bar, ...rest] = [1, 2, 3, 4];
+```
