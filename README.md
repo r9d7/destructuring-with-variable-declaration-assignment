@@ -157,6 +157,9 @@ The only exception is when the variable was already declared above and is availa
 
 ```typescript
 // `const` _, `let` bar
+// Declared `let bar` here
+//          |
+//          V
 [const _, let bar] = [1, 2, 3, 4];
 
 // `const` hello, `let` bar available from above, `const` world
