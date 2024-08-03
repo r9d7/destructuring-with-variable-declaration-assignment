@@ -153,7 +153,7 @@ Either the `default` variable type must be used/declared, or each destructured e
 [var _, const bar, ...rest] = [1, 2, 3, 4];
 ```
 
-Except only when variable was already declared above and is available in the scope:
+The only exception is when the variable was already declared above and is available in the current scope:
 
 ```typescript
 // `const` _, `let` bar
