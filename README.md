@@ -60,6 +60,7 @@ const signInAction = action(async (payload: SignInPayloadType) => {
     return rpcErrorResponse(err);
   }
 
+  // Because the variable `err` was declared with `let`, here it can be reused
   [err, const isValidPassword] = await to(fake_validatePassword(
     matchingUser.encryptedPassword,
     payload.password
@@ -69,6 +70,7 @@ const signInAction = action(async (payload: SignInPayloadType) => {
     return rpcErrorResponse(err);
   }
 
+  // Same here
   [err, const emailSentSuccess] = await to(fake_sendConfirmationEmail(
     matchingUser,
   ));
@@ -150,3 +152,23 @@ Either the `default` variable type must be used/declared, or each destructured e
 // `var` _, `const` bar, `???` ...rest
 [var _, const bar, ...rest] = [1, 2, 3, 4];
 ```
+
+Except only when variable was already declared above and is available in the scope:
+
+```typescript
+// `const` _, `let` bar
+[const _, let bar] = [1, 2, 3, 4];
+
+// `const` hello, `let` bar available from above, `const` world
+const [hello, bar, world] = ["hello", "bar", "world"];
+// or
+[const hello, bar, var world] = ["hello", "bar", "world"];
+
+// IIf there's an attempt to change the variable type already existing in scope to a different one (var/let/const), the code should not run. 
+
+// Can't change from existing `let bar` to `var bar`
+//             |
+//             V
+[const hello, var bar, let world] = ["hello", "bar", "world"];
+```
+
