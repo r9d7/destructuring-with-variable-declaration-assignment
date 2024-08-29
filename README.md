@@ -4,7 +4,7 @@
 > This proposal is under development and has not been championed to TC39 yet. Any [contribution](#contribute) is welcome!
 
 - [Overview](#overview)
-- [Motiovation](#motiovation)
+- [Motivation](#motivation)
 - [Current syntax](#current-syntax)
 - [Proposed syntax](#proposed-syntax)
 - [Usage example](#usage-example)
@@ -13,10 +13,10 @@
 
 ## Overview
 
-This proposal is chapioning the expansion of the current array destructuring syntax. The new extra syntax will allow for individual variable declaration assignment (`var/let/const`) on each destructured array element. This proves especially useful when destructuring a tuple of similar shape `[error, result]` and there is a need to re-assign the value of `error` in the code below.
+This proposal is championing the expansion of the current array destructuring syntax. The new extra syntax will allow for individual variable declaration assignment (`var/let/const`) for each destructured array element. This proves especially useful when destructuring a tuple of similar shape like `[error, result]` and there is a need to reassign the value of `error` in the code that comes after.
 
-## Motiovation
-
+## Motivation
+<!-- TODO -->
 - Better readability
 - Flatter code
 - Simplified error handling
@@ -41,7 +41,7 @@ const [first, second, ...rest] = [
 ```
 
 ```typescript
-// Syntax overview
+// Syntax Overview
 const [foo, bar] = [1, 2];
 
 let [foo, bar] = [1, 2];
@@ -96,7 +96,7 @@ The following code should behave identically to the code above:
 [const foo, let bar, var baz] = [1, 2, 3, 4];
 ```
 
-Either a `default` variable type must be declared at the beginning of the destructuring block, or each destructured element must have its own declaration. The following code should not run to avoid unexpected errors:
+Either a `default` variable type must be declared at the beginning of the destructuring block, or each destructured element must have its own declaration. The following code should execute to avoid unexpected errors:
 
 ```typescript
 // `_` -> `var`
@@ -120,7 +120,7 @@ The only exception to the above is when the variable is already declared and is 
 const [hello, bar, world] = ["hello", "bar", "world"];
 ```
 
-Lastly, if there's an attempt to re-declare the variable type for a variable in the current scope to a different one (`var/let/const`), the code should not run and instead throw a `SyntaxError`:
+Lastly, if there's an attempt to redeclare a variable's type within the current scope to a different one (`var/let/const`), the code should not execute and should instead throw a SyntaxError:
 
 ```typescript
 // Declared `let bar` here
@@ -136,7 +136,7 @@ Lastly, if there's an attempt to re-declare the variable type for a variable in 
 
 ## Usage example
 
-This syntax would play nicely with another ongoing proposal - https://github.com/arthurfiorette/proposal-safe-assignment-operator. I've been using the [`to`](https://github.com/scopsy/await-to-js/blob/master/src/await-to-js.ts) util to achieve a similar result, and often I wanted to reassign the `error` in the same scope, but I'd have to declare both variables with `let`.
+This syntax would integrate well with another ongoing proposal - https://github.com/arthurfiorette/proposal-safe-assignment-operator. I've been using the [`to`](https://github.com/scopsy/await-to-js/blob/master/src/await-to-js.ts) util to achieve a similar result, and I often wanted to reassign the `error` in the same scope, but I'd have to declare both variables with `let`.
 
 ```typescript
 // https://github.com/scopsy/await-to-js/blob/master/src/await-to-js.ts
@@ -172,7 +172,7 @@ const [error, matchingUser] = await to(prisma.user.findUnique({ ... }));
 // Real-world scenario
 // - SolidStart code
 // - Using the `to` function from the previous code block
-// - With pseudo code to showcase the usecase
+// - With pseudo code to showcase the use case
 
 const signInAction = action(async (payload: SignInPayloadType) => {
   "use server"
