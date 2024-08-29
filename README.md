@@ -86,11 +86,11 @@ let [foo, bar, const baz] = [1, 2, 3, 4];
 In these examples, the declaration type (`var`, `let`, `const`) closest to the variable name takes precedence. The following syntax should behave identically:
 
 ```typescript
-// Example 1 (equivalent)
+// Example 1 (equivalent to the example from the previous code block)
 [const foo, let bar, const ...rest] = [1, 2, 3, 4];
 [const foo, let bar, ...const rest] = [1, 2, 3, 4]; // TODO: Figure out where to place the `...`
 
-// Example 2 (equivalent)
+// Example 2 (equivalent to the example from the previous code block)
 [const foo, let bar, var baz] = [1, 2, 3, 4];
 ```
 
