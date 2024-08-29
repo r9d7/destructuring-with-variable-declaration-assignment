@@ -1,7 +1,7 @@
-# ECMAScript proposal: Destructuring with variable declaration assignment
+# ECMAScript Proposal: Destructuring with Variable Declaration Assignment
 
 > [!WARNING]
-> This proposal is under development and has not been championed to TC39 yet. Any [contribution](#contribute) is welcome!
+> This proposal is under development and has not yet been championed to TC39. Contributions and feedback are welcome - please see [contribution](#contribute) for details.
 
 - [Overview](#overview)
 - [Motivation](#motivation)
@@ -13,14 +13,14 @@
 
 ## Overview
 
-This proposal is championing the expansion of the current array destructuring syntax. The new extra syntax will allow for individual variable declaration assignment (`var/let/const`) for each destructured array element. This proves especially useful when destructuring a tuple of similar shape like `[error, result]` and there is a need to reassign the value of `error` in the code that comes after.
+This proposal aims to extend the current array destructuring syntax in JavaScript by allowing variable declarations (`var`, `let`, `const`) to be assigned directly to individual elements within a destructuring block. This enhancement is particularily useful in scenarios when destructuring from a tuple like `[error, result]`, and the `error` needs to be reassigned in the code that comes after.
 
 ## Motivation
-<!-- TODO -->
-- Better readability
-- Flatter code
-- Simplified error handling
-- Combo with https://github.com/arthurfiorette/proposal-safe-assignment-operator?tab=readme-ov-file#help-us-improve-this-proposal
+
+- **Simplified Error Handling**: This syntax facilitates error handling patterns where a variable (e.g. `error`) may need to be reassigned multiple times within the same scope
+- **Cleaner Code**: It reduces the need for extra lines of code to declare and assign variables separately. The advantages are better in a TypeScript codebase.
+
+This proposal complements ongoing discussions around enhances the [Safe Assignment Operator proposal](https://github.com/arthurfiorette/proposal-safe-assignment-operator), providing developers with more robust tools for managing `Promise` errors.
 
 ## Current syntax
 
