@@ -22,9 +22,9 @@ This proposal aims to extend the current array destructuring syntax in JavaScrip
 
 This proposal complements ongoing discussions around enhances the [Safe Assignment Operator proposal](https://github.com/arthurfiorette/proposal-safe-assignment-operator), providing developers with more robust tools for managing `Promise` errors.
 
-## Current syntax
+## Current Syntax
 
-Variable destructuring was an exciting addition to the JS language - millions of developers use it daily and you can find it being used in most of the modern software as it makes the code more readable:
+JavaScript's existing destructuring syntax is widely used for its ability to make code more readable and concise. Here are some examples of the current syntax:
 
 ```typescript
 // Solid.js Signals example
@@ -55,83 +55,74 @@ var foo, bar;
 [foo, bar] = [1, 2];
 ```
 
-## Proposed syntax
+## Proposed Syntax
 
-Any declaration that's specified within the destructuring block will take precedence over the default.
+This proposal introduces the ability to specify variable declarations (`var`, `let`, `const`) directly within a destructuring assignment. The declaration specified for each element takes precedence over the default declaration for the destructuring block.
+
+### Syntax Examples
 
 ```typescript
-// - Example 1 -
-// `foo` -> `const` since that is the default
-// `bar` -> `let` will override the `const` as it's closer to the variable
-// `rest` -> `const`
+// Example 1
+// `foo` -> `const` (default)
+// `bar` -> `let` (overrides default)
+// `rest` -> `const` (default)
 const [foo, let bar, ...rest] = [1, 2, 3, 4];
 
-// - Example 2 -
+// Example 2
 // `foo` -> `const`
 // `bar` -> `let`
 // `baz` -> `var`
 const [foo, let bar, var baz] = [1, 2, 3, 4];
 
-// - Example 3 -
+// Example 3
 // `foo` -> `let`
 // `bar` -> `let`
 // `baz` -> `const`
 let [foo, bar, const baz] = [1, 2, 3, 4];
 ```
 
-The following code should behave identically to the code above:
+In these examples, the declaration type (`var`, `let`, `const`) closest to the variable name takes precedence. The following syntax should behave identically:
 
 ```typescript
-// - Example 1 -
-// `foo` -> `const` since that is the default
-// `bar` -> `let` will override the `const` as it's closer to the variable
-// `rest` -> `const`
+// Example 1 (equivalent)
 [const foo, let bar, const ...rest] = [1, 2, 3, 4];
 [const foo, let bar, ...const rest] = [1, 2, 3, 4]; // TODO: Figure out where to place the `...`
 
-// - Example 2 -
-// `foo` -> `const`
-// `bar` -> `let`
-// `baz` -> `var`
+// Example 2 (equivalent)
 [const foo, let bar, var baz] = [1, 2, 3, 4];
 ```
 
-Either a `default` variable type must be declared at the beginning of the destructuring block, or each destructured element must have its own declaration. The following code should execute to avoid unexpected errors:
+### Rules and Exceptions
+
+1. **Default Declaration Requirement**: A default variable type must be declared at the beginning of the destructuring block, or each element within the block must specify its own declaration. The following example would throw an error since `rest` lacks a declaration:
 
 ```typescript
 // `_` -> `var`
 // `bar` -> `const`
 // `rest` -> ???
-[var _, const bar, ...rest] = [1, 2, 3, 4];
+[var _, const bar, ...rest] = [1, 2, 3, 4]; // Error: `rest` lacks a declaration
 ```
 
-The only exception to the above is when the variable is already declared and is available in the current scope:
+2. **Existing Variables in Scope**: If a variable is already declared in the current scope, the proposal allows using that variable within the destructuring assignment without redeclaring its type (`var` and `let` only):
 
 ```typescript
-// Declared `let bar` here
-//          |
-//          V
-[const _, let bar] = [1, 2, 3, 4];
+// Example 1
+let bar; // `bar` is declared as `let`
 
-// - Example 1 -
-// `hello` -> `const`
-// `bar` is declared with `let` above
-// `world` -> `const`
-const [hello, bar, world] = ["hello", "bar", "world"];
+[const foo, bar] = [1, 2, 3, 4]; // `bar` retains its original `let` declaration
+
+// Example 2
+[const _, let bar] = [1, 2, 3, 4]; // `bar` is declared as `let`
+
+const [hello, bar, world] = ["hello", "bar", "world"]; // `bar` retains it's original `let` declaration, but the value is reassigned
 ```
 
-Lastly, if there's an attempt to redeclare a variable's type within the current scope to a different one (`var/let/const`), the code should not execute and should instead throw a SyntaxError:
+3. **Type Mismatch Prevention**: The code should throw a `SyntaxError` if there is an attempt to redeclare a variable in the current scope with a different type (`var`, `let`, `const`):
 
 ```typescript
-// Declared `let bar` here
-//          |
-//          V
-[const _, let bar] = [1, 2, 3, 4];
+let bar; // Declared as `let`
 
-// Can't change from existing `let bar` to `const bar`
-//             |
-//             V
-[const hello, const bar, let world] = ["hello", "bar", "world"];
+[const foo, const bar, let world] = ["hello", "bar", "world"]; // Error: `bar` cannot be redeclared as `const`
 ```
 
 ## Usage example
