@@ -71,14 +71,14 @@ This proposal introduces the ability to specify variable declarations (`var`, `l
 const [foo, let bar, ...rest] = [1, 2, 3, 4];
 
 // Example 2
-// `foo` -> `const`
+// `foo` -> `const` (default)
 // `bar` -> `let`
 // `baz` -> `var`
 const [foo, let bar, var baz] = [1, 2, 3, 4];
 
 // Example 3
-// `foo` -> `let`
-// `bar` -> `let`
+// `foo` -> `let` (default)
+// `bar` -> `let` (default)
 // `baz` -> `const`
 let [foo, bar, const baz] = [1, 2, 3, 4];
 ```
