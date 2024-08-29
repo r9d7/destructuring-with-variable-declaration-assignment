@@ -5,9 +5,11 @@
 
 - [Overview](#overview)
 - [Motivation](#motivation)
-- [Current syntax](#current-syntax)
-- [Proposed syntax](#proposed-syntax)
-- [Usage example](#usage-example)
+- [Current Syntax](#current-syntax)
+- [Proposed Syntax](#proposed-syntax)
+  - [Syntax Examples](#syntax-examples)
+  - [Rules and Exceptions](#rules-and-exceptions)
+- [Usage Example](#usage-example)
 - [Similar / Prior art](#similar--prior-art)
 - [Contribute](#contribute)
 
@@ -125,9 +127,9 @@ let bar; // Declared as `let`
 [const foo, const bar, let world] = ["hello", "bar", "world"]; // Error: `bar` cannot be redeclared as `const`
 ```
 
-## Usage example
+## Usage Example
 
-This syntax would integrate well with another ongoing proposal - https://github.com/arthurfiorette/proposal-safe-assignment-operator. I've been using the [`to`](https://github.com/scopsy/await-to-js/blob/master/src/await-to-js.ts) util to achieve a similar result, and I often wanted to reassign the `error` in the same scope, but I'd have to declare both variables with `let`.
+This syntax is particularly useful when combined with a utility like the [`to`](https://github.com/scopsy/await-to-js/blob/master/src/await-to-js.ts) function, as shown below: 
 
 ```typescript
 // https://github.com/scopsy/await-to-js/blob/master/src/await-to-js.ts
@@ -147,24 +149,10 @@ export function to<T, U = Error>(
     });
 }
 
-// Usage
-// Instead of the try/catch block
-try {
-  const matchingUser = await prisma.user.findUnique(...);
-} catch (error) {
-  // handle `error`
-}
-
-// Use the `to` util
-const [error, matchingUser] = await to(prisma.user.findUnique({ ... }));
-```
-
-```typescript
-// Real-world scenario
+// Usage in a real-world scenario
 // - SolidStart code
-// - Using the `to` function from the previous code block
-// - With pseudo code to showcase the use case
-
+// - Using the `to` utility
+// - Some pseudo code to showcase the use case
 const signInAction = action(async (payload: SignInPayloadType) => {
   "use server"
 
@@ -179,7 +167,7 @@ const signInAction = action(async (payload: SignInPayloadType) => {
 
   // do stuff with `matchingUser`
 
-  // Since the variable `err` was declared with `let` above, here it doesn't need to be declared specifically
+  // Since the variable `err` was declared with `let` above, here it can just be reassigned
   [err, const isValidPassword] = await to(fake_validatePassword(
     matchingUser.encryptedPassword,
     payload.password
@@ -211,10 +199,10 @@ const signInAction = action(async (payload: SignInPayloadType) => {
 
 ## Similar / Prior art
 
-- **Go**'s error handling allows re-using the `err` variable (https://go.dev/blog/error-handling-and-go)
+- **Go**'s error-handling patterns allow reusing the `err` variable across multiple operations, and was the inspiration behind this proposal. More details can be found [here](https://go.dev/blog/error-handling-and-go).
 
 ## Contribute
 
-This proposal is in its very early stages as I'm still finding more use cases. Feel free to open an issue or submit a PR with your suggestions/improvements.
+This proposal is in its early stages, and we are actively seeking feedback and contributions to refine the idea. Please feel free to open an issue or submit a PR with your suggestions & improvements.
 
-Any contribution is valuable!
+Every contribution is valuable and will help shape this proposal into a robust champion.
