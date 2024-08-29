@@ -10,19 +10,19 @@
   - [Syntax Examples](#syntax-examples)
   - [Rules and Exceptions](#rules-and-exceptions)
 - [Usage Example](#usage-example)
-- [Similar / Prior art](#similar--prior-art)
+- [Similar / Prior Art](#similar--prior-art)
 - [Contribute](#contribute)
 
 ## Overview
 
-This proposal aims to extend the current array destructuring syntax in JavaScript by allowing variable declarations (`var`, `let`, `const`) to be assigned directly to individual elements within a destructuring block. This enhancement is particularily useful in scenarios when destructuring from a tuple like `[error, result]`, and the `error` needs to be reassigned in the code that comes after.
+This proposal aims to extend the current array destructuring syntax in JavaScript by allowing variable declarations (`var`, `let`, `const`) to be assigned directly to individual elements within a destructuring block. This enhancement is particularly useful in scenarios when destructuring from a tuple like `[error, result]`, and the `error` needs to be reassigned later in the code.
 
 ## Motivation
 
-- **Simplified Error Handling**: This syntax facilitates error handling patterns where a variable (e.g. `error`) may need to be reassigned multiple times within the same scope
-- **Cleaner Code**: It reduces the need for extra lines of code to declare and assign variables separately. The advantages are better in a TypeScript codebase.
+- **Simplified Error Handling**: This syntax facilitates error-handling patterns where a variable (e.g., `error`) may need to be reassigned multiple times within the same scope.
+- **Cleaner Code**: It reduces the need for extra lines of code to declare and assign variables separately. The advantages are even more noticeable in TypeScript codebases.
 
-This proposal complements ongoing discussions around enhances the [Safe Assignment Operator proposal](https://github.com/arthurfiorette/proposal-safe-assignment-operator), providing developers with more robust tools for managing `Promise` errors.
+This proposal complements ongoing discussions and enhances the [Safe Assignment Operator proposal](https://github.com/arthurfiorette/proposal-safe-assignment-operator), providing developers with more robust tools for managing `Promise` errors.
 
 ## Current Syntax
 
@@ -116,7 +116,7 @@ let bar; // `bar` is declared as `let`
 // Example 2
 [const _, let bar] = [1, 2, 3, 4]; // `bar` is declared as `let`
 
-const [hello, bar, world] = ["hello", "bar", "world"]; // `bar` retains it's original `let` declaration, but the value is reassigned
+const [hello, bar, world] = ["hello", "bar", "world"]; // `bar` retains its original `let` declaration, but the value is reassigned
 ```
 
 3. **Type Mismatch Prevention**: The code should throw a `SyntaxError` if there is an attempt to redeclare a variable in the current scope with a different type (`var`, `let`, `const`):
@@ -197,9 +197,9 @@ const signInAction = action(async (payload: SignInPayloadType) => {
 }, "auth:sign-in");
 ```
 
-## Similar / Prior art
+## Similar / Prior Art
 
-- **Go**'s error-handling patterns allow reusing the `err` variable across multiple operations, and was the inspiration behind this proposal. More details can be found [here](https://go.dev/blog/error-handling-and-go).
+- **Go**'s error-handling allows reusing the `err` variable across multiple operations, and was the original inspiration behind this proposal. More details can be found [here](https://go.dev/blog/error-handling-and-go).
 
 ## Contribute
 
